@@ -12,10 +12,17 @@ function getWeather(city) {
       const cityName = data.name;
       const temperature = data.main.temp;
       const humidity = data.main.humidity;
-      const description = data.weather[0].description;
+      const { icon, description } = data.weather[0];
       const rainfall = data.rain ? `${data.rain["1h"]} mm/h` : "N/A";
       const windSpeed = data.wind.speed;
+      const{dt}=data;
 
+      //Date section starts frome here
+      const date = new Date(dt * 1000);
+
+      const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      const dayOfWeek = daysOfWeek[date.getDay()];
+      const dateString = `${date.toLocaleDateString()}, ${dayOfWeek}`;
  
 
       // Update the HTML with the weather information
@@ -23,8 +30,10 @@ function getWeather(city) {
       document.querySelector('.temp').textContent = `Temperature: ${temperature}°C`;
       document.querySelector('.humidity').textContent = `Humidity: ${humidity}%`;
       document.querySelector('.description').textContent = `Weather Description: ${description}`;
+      document.querySelector(".icon").src = "https://openweathermap.org/img/wn/" + icon + ".png";
       document.querySelector('.rainfall').textContent = `Rainfall: ${rainfall}`;
       document.querySelector('.wind-speed').textContent = `Wind Speed: ${windSpeed} m/s`;
+      document.querySelector(".dt").innerText ="Date and Day: " + dateString + " UTC";
  
      
     })
@@ -38,28 +47,6 @@ function getWeather(city) {
     });
 }
 
-function updateDateTime(timezone) {
-  // Get the current date and time for the given timezone
-  const now = new Date();
-  const utcOffset = now.getTimezoneOffset() * 60; // Get the UTC offset in seconds
-  const localTime = now.getTime() + (timezone + utcOffset) * 1000; // Calculate the local time in milliseconds
-  const localDate = new Date(localTime);
-
-  // Format the date and time string
-  const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-  const timeOptions = { hour: 'numeric', minute: 'numeric', hour12: true };
-  const dateString = localDate.toLocaleDateString(undefined, dateOptions);
-  const timeString = localDate.toLocaleTimeString(undefined, timeOptions);
-
-  // Update the HTML with the date and time
-  const datetimeElement = document.querySelector('.datetime');
-  datetimeElement.textContent = `${dateString} ${timeString}`;
-
-}
-
-// Update the date and time every second
-setInterval(updateDateTime, 1000);
-
 // Attach an event listener to the form to fetch weather data when the form is submitted
 const form = document.querySelector('form');
 form.addEventListener('submit', event => {
@@ -68,3 +55,5 @@ form.addEventListener('submit', event => {
   const city = cityInput.value.trim();
   getWeather(city);
 });
+
+getWeather("putalibazar");
